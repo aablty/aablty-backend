@@ -7,13 +7,12 @@ from ..db import get_db
 from ..auth import AdminAuth
 from ..utils import (
     upload_cv,
-    get_cv_url,
     get_cv_info
 )
 
 router = APIRouter()
 
-CV_PUBLIC_ID = "cv/resume.pdf"
+CV_PUBLIC_ID = "cv/cv"
 CV_FOLDER = "cv"
 
 

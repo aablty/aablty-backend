@@ -70,16 +70,6 @@ def upload_cv(content: bytes, public_id) -> str:
     return result["secure_url"]
 
 
-def get_cv_url(public_id) -> str:
-    from cloudinary.utils import cloudinary_url
-    url, _ = cloudinary_url(
-        public_id,
-        resource_type="raw",
-        format="pdf"
-    )
-    return url
-
-
 def get_cv_info(public_id) -> dict:
     try:
         url, _ = cloudinary_url(
