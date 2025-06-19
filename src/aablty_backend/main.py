@@ -1,6 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer
 
 from .routes import projects, skills, facts, education, certifications, public, cv
@@ -71,6 +70,9 @@ app.include_router(
     cv.router, prefix="/api/cv", tags=["cv"])
 
 
+@app.head("/ping")
+async def ping_head():
+    return Response(status_code=200)
 
 
 @app.get("/")
