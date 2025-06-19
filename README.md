@@ -13,7 +13,7 @@
 <p align="center">
   <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-009688.svg?style=flat&logo=FastAPI&logoColor=white">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB.svg?style=flat&logo=Python&logoColor=white">
-  <img alt="SQLite" src="https://img.shields.io/badge/SQLite-003B57.svg?style=flat&logo=SQLite&logoColor=white">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-003B57.svg?style=flat&logo=PostgreSQL&logoColor=white">
   <img alt="Render" src="https://img.shields.io/badge/Render-46E3B7.svg?style=flat&logo=Render&logoColor=white">
   <img alt="Poetry" src="https://img.shields.io/badge/Poetry-60A5FA.svg?style=flat&logo=Poetry&logoColor=white">
 </p>
