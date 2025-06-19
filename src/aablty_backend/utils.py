@@ -1,7 +1,6 @@
 import os
 
-import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
+from cloudinary import uploader, api, exceptions
 from fastapi import UploadFile, HTTPException
 from fastapi.concurrency import run_in_threadpool
 
@@ -33,7 +32,7 @@ async def upload_file(upload_file: UploadFile) -> dict:
         raise HTTPException(status_code=413, detail="File too large")
 
     def upload_to_cloudinary():
-        return cloudinary.uploader.upload(
+        return uploader.upload(
             content
         )
 
@@ -50,7 +49,7 @@ async def delete_file(image_public_id: str) -> bool:
         return False
 
     def delete_from_cloudinary():
-        return cloudinary.uploader.destroy(image_public_id)
+        return uploader.destroy(image_public_id)
 
     try:
         result = await run_in_threadpool(delete_from_cloudinary)
@@ -60,28 +59,26 @@ async def delete_file(image_public_id: str) -> bool:
 
 
 def upload_cv(content: bytes, public_id) -> str:
-    result = cloudinary.uploader.upload(
+    result = uploader.upload(
         content,
         resource_type="raw",
         public_id=public_id,
-        overwrite=True,
-        format="pdf"
+        overwrite=True
     )
     return result["secure_url"]
 
 
 def get_cv_info(public_id) -> dict:
     try:
-        url, _ = cloudinary_url(
+        result = api.resource(
             public_id,
             resource_type="raw"
         )
-
         return {
             "exists": True,
-            "download_url": url
+            "download_url": result["secure_url"]
         }
-    except cloudinary.exceptions.NotFound:
+    except exceptions.NotFound:
         return {
             "exists": False,
             "message": "CV not available"
