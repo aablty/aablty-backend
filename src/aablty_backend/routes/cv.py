@@ -12,8 +12,6 @@ from ..utils import (
 
 router = APIRouter()
 
-CV_PUBLIC_ID = "cv"
-
 
 @router.post("/upload")
 async def upload_cv_endpoint(
@@ -29,12 +27,10 @@ async def upload_cv_endpoint(
                 detail="Only PDF files are allowed for CV"
             )
 
-        content = await cv_file.read()
-
-        url = upload_cv(content, CV_PUBLIC_ID)
+        url = await upload_cv(cv_file)
 
         return {
-            "detail": "CV uploaded successfully",
+            "success": True,
             "download_url": url
         }
 
@@ -45,7 +41,7 @@ async def upload_cv_endpoint(
 @router.get("/info")
 async def get_cv_info_public():
     try:
-        info = get_cv_info(CV_PUBLIC_ID)
+        info = get_cv_info()
         return info
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

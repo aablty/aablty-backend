@@ -58,22 +58,20 @@ async def delete_file(image_public_id: str) -> bool:
         return False
 
 
-def upload_cv(content: bytes, public_id) -> str:
+async def upload_cv(cv_file: UploadFile) -> str:
+    content = await cv_file.read()
     result = uploader.upload(
         content,
-        resource_type="raw",
-        public_id=public_id,
+        public_id="cv",
         overwrite=True,
-        format="pdf"
     )
     return result["secure_url"]
 
 
-def get_cv_info(public_id) -> dict:
+def get_cv_info() -> dict:
     try:
         result = api.resource(
-            public_id + ".pdf",
-            resource_type="raw"
+            "cv"
         )
         return {
             "exists": True,
@@ -81,8 +79,7 @@ def get_cv_info(public_id) -> dict:
         }
     except exceptions.NotFound:
         return {
-            "exists": False,
-            "message": "CV not available"
+            "exists": False
         }
 
 

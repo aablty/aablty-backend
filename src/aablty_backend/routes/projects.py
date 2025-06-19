@@ -60,7 +60,6 @@ async def create_project_endpoint(
         # Handle image upload if provided
         if image and image.filename:
             upload_image = await upload_file(image)
-            print(upload_image)
 
         project = CreateProject(
             title=Translation(ru=title_ru, en=title_en),
