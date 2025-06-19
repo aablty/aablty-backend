@@ -6,11 +6,9 @@ from fastapi.security import HTTPBearer
 from .routes import projects, skills, facts, education, certifications, public, cv
 from .db import init_db
 from .config import settings
-from .utils import ensure_upload_dir
 
 # Init db and upload directory
 init_db()
-ensure_upload_dir()
 
 # Configure security scheme
 security = HTTPBearer()
@@ -72,9 +70,6 @@ app.include_router(certifications.router,
 app.include_router(
     cv.router, prefix="/api/cv", tags=["cv"])
 
-# Mount static files
-app.mount(
-    "/static", StaticFiles(directory="src/aablty_backend/static"), name="static")
 
 
 

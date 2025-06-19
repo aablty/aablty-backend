@@ -48,7 +48,3 @@ Thumbs.db
 
 # Databases
 *.db
-
-# static files
-cv/
-images/

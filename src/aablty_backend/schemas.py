@@ -27,10 +27,11 @@ class ProjectLink(BaseModel):
 
 
 class BaseProject(BaseModel):
-    type: Optional[ProjectType]
+    type: ProjectType
     title: Translation
     description: Translation
-    image: Optional[str]
+    image: str
+    image_public_id: str
     stack: List[str]
     links: List[ProjectLink]
 

@@ -26,7 +26,7 @@ from ..crud import (
     delete_project
 )
 from ..utils import (
-    save_upload_file,
+    upload_file,
     delete_file,
     convert_db_model_to_schema
 )
@@ -59,14 +59,16 @@ async def create_project_endpoint(
 
         # Handle image upload if provided
         if image and image.filename:
-            image_path = await save_upload_file(image)
+            upload_image = await upload_file(image)
+            print(upload_image)
 
         project = CreateProject(
             title=Translation(ru=title_ru, en=title_en),
             description=Translation(ru=description_ru, en=description_en),
             stack=stack,
             type=type,
-            image=image_path,
+            image=upload_image["secure_url"],
+            image_public_id=upload_image["public_id"],
             links=[ProjectLink(**link) for link in links_list]
         )
 
@@ -94,7 +96,7 @@ def get_projects_endpoint(
 
 
 @router.delete("/{project_id}")
-def delete_project_endpoint(
+async def delete_project_endpoint(
     project_id: str,
     admin_auth: bool = AdminAuth,
     db: Session = Depends(get_db)
@@ -105,8 +107,8 @@ def delete_project_endpoint(
         raise HTTPException(status_code=404, detail="Project not found")
 
     # Delete image file if exists
-    if db_project.image:
-        delete_file(db_project.image)
+    if db_project.image_public_id:
+        await delete_file(db_project.image_public_id)
 
     # Delete project from DB
     success = delete_project(db, project_id)

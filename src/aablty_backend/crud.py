@@ -11,6 +11,7 @@ def create_project(db: Session, project: schemas.CreateProject) -> models.Projec
         description_ru=project.description.ru,
         description_en=project.description.en,
         image=project.image,
+        image_public_id=project.image_public_id,
         stack=project.stack,
         type=project.type.value if project.type else None,
         links=[link.model_dump() for link in project.links]

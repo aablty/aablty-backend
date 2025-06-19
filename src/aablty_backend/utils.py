@@ -1,39 +1,22 @@
 import os
-import uuid
-import aiofiles
+
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 from fastapi import UploadFile, HTTPException
-from PIL import Image
-import io
+from fastapi.concurrency import run_in_threadpool
 
 from .config import settings
 
 
-UPLOAD_DIR = "src/aablty_backend/static/images"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 MAX_FILE_SIZE = settings.MAX_FILE_SIZE
 
 
-def ensure_upload_dir():
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
-def get_file_extension(filename: str) -> str:
-    return os.path.splitext(filename)[1].lower()
-
-
 def is_allowed_file(filename: str) -> bool:
-    return get_file_extension(filename) in ALLOWED_EXTENSIONS
+    return os.path.splitext(filename)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def generate_unique_filename(original_filename: str) -> str:
-    extension = get_file_extension(original_filename)
-    unique_id = str(uuid.uuid4())
-    return f"{unique_id}{extension}"
-
-
-async def save_upload_file(upload_file: UploadFile) -> str:
-    ensure_upload_dir()
-
+async def upload_file(upload_file: UploadFile) -> dict:
     # Validate file
     if not upload_file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
@@ -44,49 +27,76 @@ async def save_upload_file(upload_file: UploadFile) -> str:
             detail=f"File type not allowed. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
         )
 
-    # Read file content
-    content = await upload_file.read()
-
     # Check file size
+    content = await upload_file.read()
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File too large")
 
-    # Validate image
-    try:
-        image = Image.open(io.BytesIO(content))
-        image.verify()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid image file")
+    def upload_to_cloudinary():
+        return cloudinary.uploader.upload(
+            content
+        )
 
-    # Generate unique filename
-    filename = generate_unique_filename(upload_file.filename)
-    file_path = os.path.join(UPLOAD_DIR, filename)
-    print(file_path)
+    result = await run_in_threadpool(upload_to_cloudinary)
 
-    # Save file
-    async with aiofiles.open(file_path, 'wb') as f:
-        await f.write(content)
+    if not result:
+        raise HTTPException(status_code=500, detail="Image upload failed")
 
-    # Return relative path for frontend
-    return f"/static/images/{filename}"
+    return result
 
 
-def delete_file(file_path: str) -> bool:
-    if not file_path or not file_path.startswith("/static/images/"):
+async def delete_file(image_public_id: str) -> bool:
+    if not image_public_id:
         return False
 
-    # Convert to actual file path
-    filename = file_path.replace("/static/images/", "")
-    actual_path = os.path.join(UPLOAD_DIR, filename)
+    def delete_from_cloudinary():
+        return cloudinary.uploader.destroy(image_public_id)
 
     try:
-        if os.path.exists(actual_path):
-            os.remove(actual_path)
-            return True
+        result = await run_in_threadpool(delete_from_cloudinary)
+        return result.get("result") == "ok"
     except Exception:
-        pass
+        return False
 
-    return False
+
+def upload_cv(content: bytes, public_id) -> str:
+    result = cloudinary.uploader.upload(
+        content,
+        resource_type="raw",
+        public_id=public_id,
+        overwrite=True,
+        format="pdf"
+    )
+    return result["secure_url"]
+
+
+def get_cv_url(public_id) -> str:
+    from cloudinary.utils import cloudinary_url
+    url, _ = cloudinary_url(
+        public_id,
+        resource_type="raw",
+        format="pdf"
+    )
+    return url
+
+
+def get_cv_info(public_id) -> dict:
+    try:
+        url, _ = cloudinary_url(
+            public_id,
+            resource_type="raw",
+            format="pdf"
+        )
+
+        return {
+            "exists": True,
+            "download_url": url
+        }
+    except cloudinary.exceptions.NotFound:
+        return {
+            "exists": False,
+            "message": "CV not available"
+        }
 
 
 def convert_db_model_to_schema(db_model, schema_class):
@@ -119,7 +129,7 @@ def convert_db_model_to_schema(db_model, schema_class):
             }
 
         # Add specific fields
-        for field in ['image', 'links', 'items', 'stack', 'type']:
+        for field in ['image', 'links', 'items', 'stack', 'type', 'image_public_id']:
             if hasattr(db_model, field):
                 data[field] = getattr(db_model, field)
 

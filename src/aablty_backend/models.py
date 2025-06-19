@@ -13,6 +13,7 @@ class Project(Base):
     description_ru = Column(Text, nullable=False)
     description_en = Column(Text, nullable=False)
     image = Column(String, nullable=False)
+    image_public_id = Column(String, nullable=False)
     stack = Column(JSON, nullable=False, default=lambda: [])  # List[str]
     links = Column(JSON, nullable=False)  # List[dict] keys: "label", "link"
 
