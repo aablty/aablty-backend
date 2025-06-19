@@ -28,7 +28,7 @@ async def send_form(
             return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
 
         text = (
-            f"🔔 *New message*\:\n\n"
+            f"🔔 *New message*:\n\n"
             f"*Name*: {escape_markdown(request.name)}\n"
             f"*Email*: {escape_markdown(request.email)}\n"
             f"*Message*:\n{escape_markdown(request.message)}"
