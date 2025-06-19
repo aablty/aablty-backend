@@ -73,7 +73,8 @@ def get_cv_info(public_id) -> dict:
     try:
         result = api.resource(
             public_id,
-            resource_type="raw"
+            resource_type="raw",
+            format="pdf"
         )
         return {
             "exists": True,
