@@ -72,9 +72,8 @@ def upload_cv(content: bytes, public_id) -> str:
 def get_cv_info(public_id) -> dict:
     try:
         result = api.resource(
-            public_id,
-            resource_type="raw",
-            format="pdf"
+            public_id + ".pdf",
+            resource_type="raw"
         )
         return {
             "exists": True,
