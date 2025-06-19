@@ -25,7 +25,7 @@ from ..auth import AdminAuth
 router = APIRouter()
 
 
-@router.post("/", response_model=Fact)
+@router.post("/")
 def create_fact_endpoint(
     content_ru: str = Query(...),
     content_en: str = Query(...),
