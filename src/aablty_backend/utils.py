@@ -63,7 +63,8 @@ def upload_cv(content: bytes, public_id) -> str:
         content,
         resource_type="raw",
         public_id=public_id,
-        overwrite=True
+        overwrite=True,
+        format="pdf"
     )
     return result["secure_url"]
 
