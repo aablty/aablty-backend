@@ -74,8 +74,7 @@ def get_cv_info(public_id) -> dict:
     try:
         url, _ = cloudinary_url(
             public_id,
-            resource_type="raw",
-            format="pdf"
+            resource_type="raw"
         )
 
         return {

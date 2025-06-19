@@ -12,8 +12,7 @@ from ..utils import (
 
 router = APIRouter()
 
-CV_PUBLIC_ID = "cv/cv"
-CV_FOLDER = "cv"
+CV_PUBLIC_ID = "cv"
 
 
 @router.post("/upload")
