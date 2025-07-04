@@ -62,7 +62,7 @@ async def upload_cv(cv_file: UploadFile) -> str:
     content = await cv_file.read()
     result = uploader.upload(
         content,
-        public_id="cv",
+        public_id="Nurgali_Nursultan_full-stack",
         overwrite=True,
     )
     return result["secure_url"]
@@ -71,7 +71,7 @@ async def upload_cv(cv_file: UploadFile) -> str:
 def get_cv_info() -> dict:
     try:
         result = api.resource(
-            "cv"
+            "Nurgali_Nursultan_full-stack"
         )
         return {
             "exists": True,
